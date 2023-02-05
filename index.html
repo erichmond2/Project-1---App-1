@@ -1,0 +1,65 @@
+<html>
+<head>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+  integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+  crossorigin=""/>
+
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+  integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+  crossorigin=""></script>
+
+  <script src="https://cdn.rawgit.com/jquery/jquery-ui/74f8a0ac/external/jquery-2.1.1/jquery.js"></script>
+</head>
+<body>
+<div id="map"></div>
+  <style>
+    #map {
+      height: 800px;
+      width: 800px
+    }
+  </style>
+
+<script>
+  var map = L.map('map').setView([38,-100], 3);
+
+  L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.{ext}', {
+    attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    subdomains: 'abcd',
+    minZoom: 0,
+    maxZoom: 20,
+    ext: 'png'
+  }).addTo(map);
+
+  $.getJSON("https://data-usfs.hub.arcgis.com/datasets/usfs::baileys-ecoregions-and-subregions-dataset.geojson?outSR=%7B%22latestWkid%22%3A4269%2C%22wkid%22%3A4269%7D", function(data){
+    var climateFeature = L.geoJson(data, {
+      style: function (feature) {
+        return {
+          color: 'blue'
+        };
+      }
+    }).addTo(map);
+    L.geoJson(data, {
+      onEachFeature: function (feature, layer) {
+        layer.bindPopup('<h1>This climate zone is classified as: ' + feature.properties.DIVISION + '</h1>');
+      }
+    }).addTo(map);
+  });
+
+  $.getJSON("https://gist.githubusercontent.com/mcwhittemore/1f81416ff74dd64decc6/raw/f34bddb3bf276a32b073ba79d0dd625a5735eedc/usa-state-capitals.geojson", function(data){
+    var citiesFeature = L.geoJson(data, {
+      style: function (feature) {
+        return {
+          color: 'red'
+        };
+      }
+    }).addTo(map);
+    L.geoJson(data, {
+      onEachFeature: function (feature, layer) {
+        layer.bindPopup('<h1>' + feature.properties.name + ', ' + feature.properties.state + '</h1>');
+      }
+    }).addTo(map);
+  });
+
+</script>
+</body>
+</html>
